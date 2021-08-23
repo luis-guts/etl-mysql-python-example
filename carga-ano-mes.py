@@ -2,7 +2,6 @@ import pymysql
 import environment
 
 def main():
-    
     print("Starting job")
 
     hostname = environment.hostname

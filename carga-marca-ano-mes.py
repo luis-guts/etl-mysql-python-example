@@ -5,16 +5,11 @@ def main():
     
     print("Starting job")
 
-    hostname = environment.hostname
-    username = environment.username
-    password = environment.password
-    database = environment.database
-
     myconnection = pymysql.connect(
-        host = hostname,
-        user = username,
-        passwd = password,
-        db = database
+        host = environment.hostname,
+        user = environment.username,
+        passwd = environment.password,
+        db = environment.database
     )
 
     with myconnection.cursor() as curs:

@@ -30,16 +30,23 @@ def main():
                         FROM vendas.historico_venda
                         group by ID_MARCA, MARCA, ID_LINHA, LINHA;""")
     
+        getData = True
 
-        result = curs.fetchall()
-
-        insert = """insert into marca_linha(id_marca, marca, id_linha, linha, quantidade_vendida)
-        VALUES(%s, %s, %s, %s, %s)
-        """
-        curs.executemany(insert, result)
+        while getData:
+            result = curs.fetchmany(environment.chunksize)
+            if len(result) != 0:
+                insert = """insert into marca_linha(id_marca, marca, id_linha, linha, quantidade_vendida)
+                VALUES(%s, %s, %s, %s, %s)
+                """
+                with myconnection.cursor() as insertCurs:
+                    print("lote inserido")
+                    insertCurs.executemany(insert, result)
+            else:
+                print("Fim da lista de chunks")
+                getData = False
 
         myconnection.commit()
-        print(str(len(result)) + " Linhas inseridas")
+        print("Dados inseridos")
         myconnection.close()
 
     return ("Done!", 200)

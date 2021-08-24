@@ -39,16 +39,22 @@ def main():
             ) AS HISTORICO_VENDA_FORMATADO
         group by HISTORICO_VENDA_FORMATADO.ID_MARCA, HISTORICO_VENDA_FORMATADO.Marca, HISTORICO_VENDA_FORMATADO.ANO_VENDA, HISTORICO_VENDA_FORMATADO.MES_VENDA""")
     
+        getData = True
 
-        result = curs.fetchall()
-
-        insert = """insert into marca_ano_mes(id_marca, marca, ano, mes, quantidade_vendida)
-        VALUES(%s, %s, %s, %s, %s)
-        """
-        curs.executemany(insert, result)
+        while getData:
+            result = curs.fetchmany(environment.chunksize)
+            if len(result) != 0:
+                insert = """insert into marca_ano_mes(id_marca, marca, ano, mes, quantidade_vendida)
+                VALUES(%s, %s, %s, %s, %s)
+                """
+                with myconnection.cursor() as insertCurs:
+                    insertCurs.executemany(insert, result)
+            else:
+                print("Fim da lista de chunks")
+                getData = False
 
         myconnection.commit()
-        print(str(len(result)) + " Linhas inseridas")
+        print("Dados inseridos")
         myconnection.close()
 
     return ("Done!", 200)
